@@ -16,9 +16,9 @@
 CologneChip::CologneChip(FtdiSpi *spi, const std::string &filename,
 	const std::string &file_type, Device::prog_type_t prg_type,
 	uint16_t rstn_pin, uint16_t done_pin, uint16_t fail_pin, uint16_t oen_pin,
-	bool verify, int8_t verbose) :
+	bool verify, int8_t verbose, bool skip_reset) :
 	Device(NULL, filename, file_type, verify, verbose), _rstn_pin(rstn_pin),
-		_done_pin(done_pin), _fail_pin(fail_pin), _oen_pin(oen_pin)
+		_done_pin(done_pin), _fail_pin(fail_pin), _oen_pin(oen_pin), _skip_reset(skip_reset)
 {
 	_spi = spi;
 	_spi->gpio_set_input(_done_pin | _fail_pin);
@@ -35,8 +35,8 @@ CologneChip::CologneChip(FtdiSpi *spi, const std::string &filename,
 CologneChip::CologneChip(Jtag* jtag, const std::string &filename,
 	const std::string &file_type, Device::prog_type_t prg_type,
 	const std::string &board_name, const std::string &cable_name,
-	bool verify, int8_t verbose) :
-	Device(jtag, filename, file_type, verify, verbose)
+	bool verify, int8_t verbose, bool skip_reset) :
+	Device(jtag, filename, file_type, verify, verbose), _skip_reset(skip_reset)
 {
 	_spi = nullptr;
 
@@ -76,14 +76,16 @@ CologneChip::CologneChip(Jtag* jtag, const std::string &filename,
  */
 void CologneChip::reset()
 {
-	if (_spi) {
-		_spi->gpio_clear(_rstn_pin | _oen_pin);
-		usleep(SLEEP_US);
-		_spi->gpio_set(_rstn_pin);
-	} else if (_ftdi_jtag) {
-		_ftdi_jtag->gpio_clear(_rstn_pin | _oen_pin);
-		usleep(SLEEP_US);
-		_ftdi_jtag->gpio_set(_rstn_pin);
+	if (!_skip_reset) {
+		if (_spi) {
+			_spi->gpio_clear(_rstn_pin | _oen_pin);
+			usleep(SLEEP_US);
+			_spi->gpio_set(_rstn_pin);
+		} else if (_ftdi_jtag) {
+			_ftdi_jtag->gpio_clear(_rstn_pin | _oen_pin);
+			usleep(SLEEP_US);
+			_ftdi_jtag->gpio_set(_rstn_pin);
+		}
 	}
 }
 

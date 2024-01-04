@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 			} else if (board->manufacturer == "colognechip") {
 				target = new CologneChip(spi, args.bit_file, args.file_type, args.prg_type,
 					board->reset_pin, board->done_pin, DBUS6, board->oe_pin,
-					args.verify, args.verbose);
+					args.verify, args.verbose, args.skip_reset);
 			} else {
 				printError("Error (SPI mode): " + board->manufacturer +
 					" is an unsupported/unknown target");
@@ -581,7 +581,7 @@ int main(int argc, char **argv)
 				args.prg_type, args.flash_sector, args.verify, args.verbose, args.skip_load_bridge, args.skip_reset);
 		} else if (fab == "colognechip") {
 			fpga = new CologneChip(jtag, args.bit_file, args.file_type,
-				args.prg_type, args.board, args.cable, args.verify, args.verbose);
+				args.prg_type, args.board, args.cable, args.verify, args.verbose, args.skip_reset);
 		} else {
 			printError("Error: manufacturer " + fab + " not supported");
 			delete(jtag);

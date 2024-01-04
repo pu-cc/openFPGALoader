@@ -25,11 +25,11 @@ class CologneChip: public Device, SPIInterface {
 		CologneChip(FtdiSpi *spi, const std::string &filename,
 			const std::string &file_type, Device::prog_type_t prg_type,
 			uint16_t rstn_pin, uint16_t done_pin, uint16_t fail_pin, uint16_t oen_pin,
-			bool verify, int8_t verbose);
+			bool verify, int8_t verbose, bool skip_reset);
 		CologneChip(Jtag* jtag, const std::string &filename,
 			const std::string &file_type, Device::prog_type_t prg_type,
 			const std::string &board_name, const std::string &cable_name,
-			bool verify, int8_t verbose);
+			bool verify, int8_t verbose, bool skip_reset);
 		~CologneChip() {}
 
 		bool cfgDone();
@@ -68,6 +68,7 @@ class CologneChip: public Device, SPIInterface {
 		uint16_t _done_pin;
 		uint16_t _fail_pin;
 		uint16_t _oen_pin;
+		bool _skip_reset = false;
 };
 
 #endif // SRC_COLOGNECHIP_HPP_
